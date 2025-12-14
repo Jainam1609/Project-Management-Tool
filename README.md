@@ -6,7 +6,7 @@ A multi-tenant project management system with Django (GraphQL) backend and React
 
 - ✅ Multi-tenant architecture (organization-based data isolation)
 - ✅ Project management with status tracking
-- ✅ Task management with Kanban board
+- ✅ Task management feature
 - ✅ Task comments and collaboration
 - ✅ Project statistics and analytics
 - ✅ GraphQL API with type-safe queries
