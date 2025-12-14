@@ -577,101 +577,101 @@ const projects: Project[] = useMemo(() => {
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 2. REACT COMPONENT                                          │
-│    ProjectDashboard.tsx calls useQuery(GET_PROJECTS)       │
+│    ProjectDashboard.tsx calls useQuery(GET_PROJECTS)        │
 │    Location: frontend/src/components/ProjectDashboard.tsx:24│
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 3. APOLLO CLIENT                                            │
-│    Constructs GraphQL query string                         │
+│    Constructs GraphQL query string                          │
 │    Location: frontend/src/apollo/client.ts                  │
 │    Sends HTTP POST to http://localhost:8000/graphql/        │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 4. DJANGO URL ROUTER                                        │
-│    Matches /graphql/ path                                  │
+│    Matches /graphql/ path                                   │
 │    Location: backend/project_manager/urls.py                │
 │    Calls GraphQLView.as_view()                              │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 5. GRAPHQL SCHEMA RESOLVER                                 │
+│ 5. GRAPHQL SCHEMA RESOLVER                                  │
 │    Calls resolve_projects() method                          │
 │    Location: backend/core/schema.py:117                     │
-│    Receives: organization_slug="acme-corp"                 │
+│    Receives: organization_slug="acme-corp"                  │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 6. DJANGO ORM QUERY                                         │
-│    Organization.objects.get(slug="acme-corp")              │
+│    Organization.objects.get(slug="acme-corp")               │
 │    Location: backend/core/models.py:5                       │
 │    Generates SQL: SELECT * FROM core_organization           │
 │                   WHERE slug = 'acme-corp'                  │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 7. POSTGRESQL DATABASE                                     │
+│ 7. POSTGRESQL DATABASE                                      │
 │    Executes SQL query                                       │
-│    Returns: {id: 1, name: "Acme Corporation", ...}        │
+│    Returns: {id: 1, name: "Acme Corporation", ...}          │
 │    Database: project_manager                                │
 │    Table: core_organization                                 │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
 │ 8. DJANGO ORM CONVERSION                                    │
-│    Converts SQL row to Organization model instance         │
-│    Returns: Organization(id=1, name="Acme Corporation")   │
+│    Converts SQL row to Organization model instance          │
+│    Returns: Organization(id=1, name="Acme Corporation")     │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 9. GRAPHQL RESOLVER CONTINUES                              │
-│    Project.objects.filter(organization=organization)       │
+│ 9. GRAPHQL RESOLVER CONTINUES                               │
+│    Project.objects.filter(organization=organization)        │
 │    Location: backend/core/schema.py:123                     │
 │    Generates SQL: SELECT * FROM core_project                │
-│                   WHERE organization_id = 1                │
+│                   WHERE organization_id = 1                 │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 10. POSTGRESQL DATABASE                                    │
+│ 10. POSTGRESQL DATABASE                                     │
 │     Executes SQL query                                      │
-│     Returns: Multiple rows (projects)                      │
+│     Returns: Multiple rows (projects)                       │
 │     Table: core_project                                     │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 11. GRAPHQL FIELD RESOLUTION                               │
-│     For each project, resolves:                            │
-│     - task_count: self.tasks.count()                       │
-│       → SQL: SELECT COUNT(*) FROM core_task                │
-│              WHERE project_id = 1                          │
+│ 11. GRAPHQL FIELD RESOLUTION                                │
+│     For each project, resolves:                             │
+│     - task_count: self.tasks.count()                        │
+│       → SQL: SELECT COUNT(*) FROM core_task                 │
+│              WHERE project_id = 1                           │
 │     - completion_rate: Calculated from task counts          │
-│     Location: backend/core/schema.py:35-46                 │
+│     Location: backend/core/schema.py:35-46                  │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 12. GRAPHQL RESPONSE                                       │
+│ 12. GRAPHQL RESPONSE                                        │
 │     Constructs JSON response with all resolved fields       │
 │     Returns: {"data": {"projects": [...]}}                  │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 13. HTTP RESPONSE                                          │
-│     Django sends HTTP 200 with JSON body                   │
+│ 13. HTTP RESPONSE                                           │
+│     Django sends HTTP 200 with JSON body                    │
 │     Content-Type: application/json                          │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 14. APOLLO CLIENT                                          │
+│ 14. APOLLO CLIENT                                           │
 │     Receives response, updates cache                        │
 │     Location: frontend/src/apollo/client.ts                 │
 └───────────────────────┬─────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
-│ 15. REACT RE-RENDER                                      │
+│ 15. REACT RE-RENDER                                         │
 │     useQuery hook updates with new data                     │
-│     ProjectDashboard component re-renders                  │
-│     Projects displayed in UI                               │
+│     ProjectDashboard component re-renders                   │
+│     Projects displayed in UI                                │
 │     Location: frontend/src/components/ProjectDashboard.tsx  │
 └─────────────────────────────────────────────────────────────┘
 ```
